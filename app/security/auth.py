@@ -20,20 +20,21 @@ class AuthUser:
         self.user: Optional[User] = None
         self.request = request
 
-    async def requires_access_token(self):
+    async def requires_access_token(self, required=True):
         """
         Expects Authorization header with Bearer token
         :raise: token-related HTTPExceptions from AuthJWT
         :raise: HTTPException 401 if no user with corresponding token exists
         :return:
         """
-        #print(self.request.headers)
+        # print(self.request.headers)
         jwt_authorize = AuthJWT(req=self.request)
-        jwt_authorize.jwt_required()
+        if required:
+            jwt_authorize.jwt_required()
         user = await User.get_or_none(
             email=jwt_authorize.get_jwt_subject()
         )
-        if user is None:
+        if user is None and required:
             self._raise_unauthorized()
         self.user = user
 
@@ -45,6 +46,11 @@ class AuthUser:
         """
         if self.user is None:
             self._raise_unauthorized()
+        return self.user
+
+    def get_user_or_none(self):
+        if self.user is None:
+            return None
         return self.user
 
     def _raise_unauthorized(self, msg="Unauthorized"):

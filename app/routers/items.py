@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 from fastapi_pagination import Page, Params
 from fastapi_pagination.ext.tortoise import paginate
-from fastapi_jwt_auth.exceptions import MissingTokenError
 
 from schemas import CategorySchema, TagSchema, PostViewSchema, PostCreateSchema
 from models import User, Category, Tag, Post
@@ -29,13 +28,9 @@ async def get_post_list(common: CommonQueryParams = Depends(CommonQueryParams),
                      'category_slug': {'category__slug': common.category_slug},
                      'tag_slug': {'tag__slug': common.tag_slug}
                      }
-    try:
-        await authorize.requires_access_token()
-        user = authorize.get_user()
-    except MissingTokenError:
-        user = None
+    await authorize.requires_access_token(required=False)
     queryset = Post.all().prefetch_related('category', 'tag', 'author')
-    queryset = queryset if user is not None else queryset.filter(logged_only=False)
+    queryset = queryset if authorize.get_user_or_none() is not None else queryset.filter(logged_only=False)
     for key, value in condition_map.items():
         if getattr(common, key):
             return await paginate(queryset.filter(**value), params)
