@@ -84,7 +84,7 @@ class PostCreateSchema(BaseModel):
     slug: constr(max_length=35)
     categories_id: List[int]
     tags_id: List[int]
-    content: constr(max_length=150)
+    content: str
     image: HttpUrl
     logged_only: bool
 
@@ -107,6 +107,7 @@ class PostViewSchema(BaseModel):
     tag: List[TagSchema]
     content: constr(max_length=150)
     image: HttpUrl
+    logged_only: bool
 
     @validator('category', 'tag', pre=True)
     def validator_m2m(cls, m2m):
