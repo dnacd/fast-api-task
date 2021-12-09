@@ -28,7 +28,7 @@ class Post(models.Model):
     category = fields.ManyToManyField('models.Category', related_name='category')
     tag = fields.ManyToManyField('models.Tag', related_name='tags')
     author = fields.ForeignKeyField('models.User', related_name='events')
-    content = fields.CharField(max_length=150, null=True)
+    content = fields.TextField(null=True)
     image = fields.CharField(null=True, max_length=120)
     publish_date = fields.DatetimeField(auto_now_add=True)
     modified_at = fields.DatetimeField(auto_now_add=True)
