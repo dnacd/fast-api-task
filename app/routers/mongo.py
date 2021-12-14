@@ -19,13 +19,13 @@ async def create_post(post: PostCreateSchemaMongo = Body(...)):
     return PostCreateSchemaMongo.dict(post)
 
 
-@router.get("/post_list", response_description="List of posts", response_model=List[PostCreateSchemaMongo])
+@router.get("/post_list", response_description="List of posts")
 async def post_list_mongo(page: Optional[int] = None, size: Optional[int] = None):
-    if page and size is not None:
-        data = await content_crud.get_post_list(page_num=page, page_size=size)
-    else:
-        data = await content_crud.get_post_list(page_num=page, page_size=size, sizable=False)
-    return [post for post in data]
+    sizable = False
+    if page and size:
+        sizable = True
+    data = await content_crud.get_post_list(page_num=page, page_size=size, sizable=sizable)
+    return data
 
 
 @router.post("/post/{post_id}", response_description="Post Detail", response_model=PostCreateSchemaMongo)
