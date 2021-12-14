@@ -24,12 +24,14 @@ iso8601==0.1.16
 itsdangerous==2.0.1
 Jinja2==3.0.3
 MarkupSafe==2.0.1
+motor==2.5.1
 orjson==3.6.5
 passlib==1.7.4
 pyasn1==0.4.8
 pycparser==2.21
 pydantic==1.8.2
 PyJWT==1.7.1
+pymongo==3.12.3
 pyparsing==3.0.6
 pypika-tortoise==0.1.1
 python-dotenv==0.19.2
@@ -44,7 +46,7 @@ sniffio==1.2.0
 starlette==0.16.0
 tomlkit==0.7.2
 tortoise-orm==0.17.8
-typing-extensions==4.0.1
+typing_extensions==4.0.1
 ujson==4.3.0
 urllib3==1.26.7
 uvicorn==0.15.0

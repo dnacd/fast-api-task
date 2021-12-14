@@ -36,9 +36,11 @@ async def get_profile_settings(
 async def get_access_token(user_from_db: UserLoginSchema,
                            authorize: AuthUser = Depends()):
     user = await User.get_or_none(email=user_from_db.email)
-    if user.password_hash == password_hash(user_from_db.password):
+    if user is not None and user.password_hash == password_hash(user_from_db.password):
         authorize.user = user
         await authorize.get_user()
         return authorize.create_tokens()
+    else:
+        return 'BAD LOGIN OR PASSWORD'
 
 

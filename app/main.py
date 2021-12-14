@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from db import init_db
-from routers import items, users, api
+from postgres.db_postgres import init_db
+from routers import items, users, api, mongo
 from fastapi_jwt_auth import AuthJWT
 from jwt_config import JWTSettings
 
@@ -15,6 +15,7 @@ app = create_application()
 app.include_router(items.router)
 app.include_router(users.router)
 app.include_router(api.router)
+app.include_router(mongo.router)
 init_db(app)
 
 
