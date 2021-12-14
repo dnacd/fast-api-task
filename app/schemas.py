@@ -1,9 +1,11 @@
 import datetime
-
-from pydantic import BaseModel, constr, HttpUrl, validator, Field
+from bson import ObjectId
+from pydantic import BaseModel, constr, HttpUrl, validator
 from typing import Optional, List
 
+from pydantic.fields import Field
 from pydantic.networks import EmailStr
+from mongo.pyobj_id import PyObjectId
 
 
 class UserCreateSchema(BaseModel):
@@ -24,7 +26,7 @@ class UserCreateSchema(BaseModel):
 
 class UserLoginSchema(BaseModel):
     email: EmailStr
-    password: Optional[str]
+    password: str
 
     class Config:
         orm_mode = True
@@ -120,3 +122,32 @@ class PostViewSchema(BaseModel):
     class Config:
         orm_mode = True
 
+
+# Mongo schemas
+class PostCreateSchemaMongo(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    author_id: int
+    title: constr(max_length=55)
+    slug: constr(max_length=35)
+    categories_id: List[int]
+    tags_id: List[int]
+    content: str
+    image: HttpUrl
+    logged_only: bool
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "author_id": 1,
+                "title": "This is title",
+                "slug": "This is slug",
+                "categories_id": [1, 2, 3],
+                "tags_id": [1, 2, 3],
+                "content": "This is content string",
+                "image": "https://exampleimage.com/image.png",
+                "logged_only": False
+            }
+        }
