@@ -28,7 +28,7 @@ async def post_list_mongo(page: Optional[int] = None, size: Optional[int] = None
     return data
 
 
-@router.post("/post/{post_id}", response_description="Post Detail", response_model=PostCreateSchemaMongo)
+@router.get("/post/{post_id}", response_description="Post Detail", response_model=PostCreateSchemaMongo)
 async def post_detail_mongo(post_id: str):
     data = await content_crud.get_post(post_id=post_id)
     return data
