@@ -31,9 +31,6 @@ class MongoConnection(metaclass=SingletonMeta):
         posts_collection.create_index(get_settings().mongo_db_indexes)
 
 
-mongo_db = MongoConnection()
-
-
 def get_mongo_db() -> MongoConnection:
-    return mongo_db
+    return MongoConnection()
 

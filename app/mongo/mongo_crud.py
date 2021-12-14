@@ -7,7 +7,6 @@ from math import ceil
 from config import Settings
 from mongo.db_mongo import get_mongo_db
 
-
 mongo_db = get_mongo_db()
 
 
@@ -35,22 +34,27 @@ class ContentCRUD:
         created_post = await self.get_collection().find_one({"_id": data.inserted_id})
         return created_post
 
-    async def get_post_list(self, page_size, page_num, sizable=True):
-        if sizable:
+    async def get_post_list(self, page_size, page_num, logged=False):
+
+        if (page_size and page_num) is None:
+            data = await self.get_collection().find().to_list(10000) if logged else \
+                await self.get_collection().aggregate([{'$match': {'logged_only': False}}]).to_list(10000)
+            return data
+        else:
             skips = page_size * (page_num - 1)
-            data = await self.get_collection().find().skip(skips).limit(page_size).to_list(10000)
+            data = await self.get_collection().find().skip(skips).limit(page_size).to_list(10000) if logged else \
+                await self.get_collection().aggregate([{'$match': {'logged_only': False}},
+                                                       {'$skip': skips},
+                                                       {'$limit': page_size}]).to_list(10000)
             count = await self.get_collection().count_documents({})
             items = {
                 "items": data,
                 "page_size": page_size,
                 "page_num": page_num,
-                "total_pages": ceil(count/page_size),
+                "total_pages": ceil(count / page_size),
                 "total_docs": count
             }
             return items
-        else:
-            data = await self.get_collection().find().to_list(10000)
-            return data
 
     async def update_post(self, post_id: str, update_data: dict):
         result = await self.get_collection().update_one({'_id': ObjectId(post_id)}, {'$set': update_data})

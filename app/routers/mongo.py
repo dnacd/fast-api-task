@@ -1,6 +1,7 @@
-from typing import List, Optional
-from fastapi import APIRouter, Body
-
+from typing import Optional
+from fastapi import APIRouter, Body, Depends
+from security.auth import AuthUser
+from security.header import api_key_header
 
 from mongo.mongo_crud import content_crud
 from schemas import PostCreateSchemaMongo
@@ -19,12 +20,12 @@ async def create_post(post: PostCreateSchemaMongo = Body(...)):
     return PostCreateSchemaMongo.dict(post)
 
 
-@router.get("/post_list", response_description="List of posts")
-async def post_list_mongo(page: Optional[int] = None, size: Optional[int] = None):
-    sizable = False
-    if page and size:
-        sizable = True
-    data = await content_crud.get_post_list(page_num=page, page_size=size, sizable=sizable)
+@router.get("/post_list", response_description="List of posts", dependencies=(api_key_header,))
+async def post_list_mongo(page: Optional[int] = None,
+                          size: Optional[int] = None,
+                          authorize: AuthUser = Depends()):
+    logged = True if authorize.get_user_or_none() is not None else False
+    data = await content_crud.get_post_list(page_num=page, page_size=size, logged=logged)
     return data
 
 
