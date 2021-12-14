@@ -6,4 +6,5 @@ venv/*
 .vscode/
 *.env
 .env
+data/
 app/migrations/*
