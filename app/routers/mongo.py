@@ -6,7 +6,6 @@ from security.header import api_key_header
 from mongo.mongo_crud import content_crud
 from schemas import PostCreateSchemaMongo
 
-
 router = APIRouter(
     prefix="/mongo",
     tags=["items"],
@@ -20,11 +19,13 @@ async def create_post(post: PostCreateSchemaMongo = Body(...)):
     return PostCreateSchemaMongo.dict(post)
 
 
-@router.get("/post_list", response_description="List of posts", dependencies=(api_key_header,))
+@router.get("/post_list", response_description="List of posts",
+            dependencies=(api_key_header,))
 async def post_list_mongo(page: Optional[int] = None,
                           size: Optional[int] = None,
                           authorize: AuthUser = Depends()):
-    logged = True if authorize.get_user_or_none() is not None else False
+    await authorize.requires_access_token(required=False)
+    logged = True if authorize.get_user_or_none() is not None else None
     data = await content_crud.get_post_list(page_num=page, page_size=size, logged=logged)
     return data
 

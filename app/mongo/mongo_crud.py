@@ -35,17 +35,17 @@ class ContentCRUD:
         return created_post
 
     async def get_post_list(self, page_size, page_num, logged=False):
-
         if (page_size and page_num) is None:
-            data = await self.get_collection().find().to_list(10000) if logged else \
-                await self.get_collection().aggregate([{'$match': {'logged_only': False}}]).to_list(10000)
+            data = await self.get_collection().aggregate([{'$match': {'logged_only': False}}]).to_list(10000) if logged \
+                else await self.get_collection().find().to_list(10000)
             return data
         else:
             skips = page_size * (page_num - 1)
-            data = await self.get_collection().find().skip(skips).limit(page_size).to_list(10000) if logged else \
-                await self.get_collection().aggregate([{'$match': {'logged_only': False}},
-                                                       {'$skip': skips},
-                                                       {'$limit': page_size}]).to_list(10000)
+            data = self.get_collection().find().skip(skips).limit(page_size).to_list(10000) if logged else \
+                self.get_collection().aggregate([{'$match': {'logged_only': False}},
+                                                 {'$skip': skips},
+                                                 {'$limit': page_size}]).to_list(10000)
+            data = await data
             count = await self.get_collection().count_documents({})
             items = {
                 "items": data,
