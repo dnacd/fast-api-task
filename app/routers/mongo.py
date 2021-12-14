@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Body
 
 
@@ -19,9 +19,12 @@ async def create_post(post: PostCreateSchemaMongo = Body(...)):
     return PostCreateSchemaMongo.dict(post)
 
 
-@router.post("/post_list", response_description="List of posts", response_model=List[PostCreateSchemaMongo])
-async def post_list_mongo():
-    data = await content_crud.get_post_list()
+@router.get("/post_list", response_description="List of posts", response_model=List[PostCreateSchemaMongo])
+async def post_list_mongo(page: Optional[int] = None, size: Optional[int] = None):
+    if page and size is not None:
+        data = await content_crud.get_post_list(page_num=page, page_size=size)
+    else:
+        data = await content_crud.get_post_list(page_num=page, page_size=size, sizable=False)
     return [post for post in data]
 
 

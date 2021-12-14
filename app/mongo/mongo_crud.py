@@ -34,9 +34,14 @@ class ContentCRUD:
         created_post = await self.get_collection().find_one({"_id": data.inserted_id})
         return created_post
 
-    async def get_post_list(self):
-        data = await self.get_collection().find().to_list(1000)
-        return data
+    async def get_post_list(self, page_size, page_num, sizable=True):
+        if sizable:
+            skips = page_size * (page_num - 1)
+            data = await self.get_collection().find().skip(skips).limit(page_size).to_list(10000)
+            return data
+        else:
+            data = await self.get_collection().find().to_list(10000)
+            return data
 
     async def update_post(self, post_id: str, update_data: dict):
         result = await self.get_collection().update_one({'_id': ObjectId(post_id)}, {'$set': update_data})
