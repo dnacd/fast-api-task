@@ -69,5 +69,25 @@ class ContentCRUD:
         data = await self.get_collection_by_name('comments').find().to_list(10000)
         return data
 
+    async def add_tag(self, tag):
+        tag = jsonable_encoder(tag)
+        data = await self.get_collection_by_name('tags').insert_one(tag)
+        created_tag = await self.get_collection_by_name('tags').find_one({"_id": data.inserted_id})
+        return created_tag
+
+    async def tag_list(self):
+        data = await self.get_collection_by_name('tags').find().to_list(10000)
+        return data
+
+    async def add_category(self, category):
+        category = jsonable_encoder(category)
+        data = await self.get_collection_by_name('category').insert_one(category)
+        created_category = await self.get_collection_by_name('category').find_one({"_id": data.inserted_id})
+        return created_category
+
+    async def category_list(self):
+        data = await self.get_collection_by_name('category').find().to_list(10000)
+        return data
+
 
 content_crud = ContentCRUD()

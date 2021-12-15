@@ -2,18 +2,18 @@ from math import ceil
 from typing import Optional, List
 from fastapi import APIRouter, Depends
 
-from models import User
 from security.auth import AuthUser
 from security.header import api_key_header
 
 from mongo.mongo_crud import content_crud
 from schemas_mongo import (PostCreateSchemaMongo, PostViewSchemaMongo,
                            CommentCreateSchemaMongo, CommentListSchemaMongo,
-                           PostDetailViewSchemaMongo)
+                           PostDetailViewSchemaMongo, TagListSchemaMongo,
+                           TagCreateSchemaMongo, CategoryCreateSchemaMongo, CategoryListSchemaMongo)
 
 router = APIRouter(
     prefix="/mongo",
-    tags=["items"],
+    tags=["mongo"],
     responses={404: {"description": "Not found"}},
 )
 
@@ -54,8 +54,6 @@ async def post_list_mongo(page: Optional[int] = None,
 
 @router.get("/post/{post_id}", response_description="Post Detail", response_model=List[PostDetailViewSchemaMongo])
 async def post_detail_mongo(post_id: str):
-    authors = [[author.id, author.username] for author in await User.all()]
-    print(authors)
     data = await content_crud.get_post(post_id=post_id)
     return data
 
@@ -71,3 +69,30 @@ async def comment_list():
     data = await content_crud.comment_list()
     items = {"comments": data}
     return items
+
+
+@router.post("/add_tag", response_description="Add tag", response_model=TagCreateSchemaMongo)
+async def add_tag(tag: TagCreateSchemaMongo):
+    await content_crud.add_tag(tag)
+    return CommentCreateSchemaMongo.dict(tag)
+
+
+@router.get("/tag_list", response_description="All tags", response_model=TagListSchemaMongo)
+async def tag_list():
+    data = await content_crud.tag_list()
+    items = {"tags": data}
+    return items
+
+
+@router.post("/add_category", response_description="Add category", response_model=CategoryCreateSchemaMongo)
+async def add_category(category: CategoryCreateSchemaMongo):
+    await content_crud.add_category(category)
+    return CategoryCreateSchemaMongo.dict(category)
+
+
+@router.get("/category_list", response_description="All categories", response_model=CategoryListSchemaMongo)
+async def category_list():
+    data = await content_crud.category_list()
+    items = {"categories": data}
+    return items
+

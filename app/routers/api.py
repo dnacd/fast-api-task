@@ -8,7 +8,7 @@ from security.simple_hash import password_hash
 
 router = APIRouter(
     prefix="",
-    tags=["items"],
+    tags=["api"],
     responses={404: {"description": "Not found"}},
 )
 
