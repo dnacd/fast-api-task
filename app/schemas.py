@@ -2,10 +2,11 @@ import datetime
 from bson import ObjectId
 from pydantic import BaseModel, constr, HttpUrl, validator
 from typing import Optional, List
+from mongo.pyobj_id import PyObjectId
 
 from pydantic.fields import Field
 from pydantic.networks import EmailStr
-from mongo.pyobj_id import PyObjectId
+from mongo.mixins import PostIdMixin
 
 
 class UserCreateSchema(BaseModel):
@@ -124,8 +125,9 @@ class PostViewSchema(BaseModel):
 
 
 # Mongo schemas
+
 class PostCreateSchemaMongo(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    id: PyObjectId = Field(default_factory=ObjectId, alias='_id')
     author_id: int
     title: constr(max_length=55)
     slug: constr(max_length=35)
@@ -151,3 +153,23 @@ class PostCreateSchemaMongo(BaseModel):
                 "logged_only": False
             }
         }
+
+
+class PostSchemaMongo(PostIdMixin):
+    post_id: Optional[str]
+    author_id: int
+    title: constr(max_length=55)
+    slug: constr(max_length=35)
+    categories_id: List[int]
+    tags_id: List[int]
+    image: HttpUrl
+    created: datetime.datetime
+    logged_only: bool
+
+
+class PostViewSchemaMongo(BaseModel):
+    items: List[PostSchemaMongo]
+    page_size: int
+    page_num: int
+    total_pages: int
+    total_docs: int
