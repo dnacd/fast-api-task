@@ -1,11 +1,15 @@
 from math import ceil
-from typing import Optional
-from fastapi import APIRouter, Body, Depends
+from typing import Optional, List
+from fastapi import APIRouter, Depends
+
+from models import User
 from security.auth import AuthUser
 from security.header import api_key_header
 
 from mongo.mongo_crud import content_crud
-from schemas import PostCreateSchemaMongo, PostViewSchemaMongo
+from schemas_mongo import (PostCreateSchemaMongo, PostViewSchemaMongo,
+                           CommentCreateSchemaMongo, CommentListSchemaMongo,
+                           PostDetailViewSchemaMongo)
 
 router = APIRouter(
     prefix="/mongo",
@@ -29,25 +33,41 @@ async def post_list_mongo(page: Optional[int] = None,
                           authorize: AuthUser = Depends()):
     await authorize.requires_access_token(required=False)
     logged = True if authorize.get_user_or_none() is not None else None
+    count = await content_crud.get_collection().count_documents({}) if logged \
+        else await content_crud.get_collection().count_documents({'logged_only': False})
+    pag = 0
     if (page and size) is not None:
+        pag = 1
         skips = size * (page - 1)
-        count = await content_crud.get_collection().count_documents({}) if logged \
-            else await content_crud.get_collection().count_documents({'logged_only': False})
         data = await content_crud.get_post_list(logged=logged, paginate=True, page_size=size, skips=skips)
-        items = {
-            "items": data,
-            "page_size": size,
-            "page_num": page,
-            "total_pages": ceil(count / size),
-            "total_docs": count
-        }
-        return items
     else:
         data = await content_crud.get_post_list(logged=logged)
-        return data
+    items = {
+        "items": data,
+        "total_docs": count,
+        "page_size": size,
+        "page_num": page,
+        "total_pages": (ceil(count / size)) if pag else None
+        }
+    return items
 
 
-@router.get("/post/{post_id}", response_description="Post Detail", response_model=PostCreateSchemaMongo)
+@router.get("/post/{post_id}", response_description="Post Detail", response_model=List[PostDetailViewSchemaMongo])
 async def post_detail_mongo(post_id: str):
+    authors = [[author.id, author.username] for author in await User.all()]
+    print(authors)
     data = await content_crud.get_post(post_id=post_id)
     return data
+
+
+@router.post("/add_comment", response_description="Add new comment", response_model=CommentCreateSchemaMongo)
+async def new_comment(comment: CommentCreateSchemaMongo):
+    await content_crud.add_comment(comment)
+    return CommentCreateSchemaMongo.dict(comment)
+
+
+@router.get("/comment_list", response_description="All comments", response_model=CommentListSchemaMongo)
+async def comment_list():
+    data = await content_crud.comment_list()
+    items = {"comments": data}
+    return items
