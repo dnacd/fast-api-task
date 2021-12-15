@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from schemas import UserCreateSchema, ViewListUserSchema, UserInfoSchema
+from schemas.schemas import UserCreateSchema, ViewListUserSchema, UserInfoSchema
 from typing import List
 from models import User
 

@@ -3,7 +3,7 @@ from fastapi_jwt_auth import AuthJWT
 from typing import Optional
 
 from models import User
-from schemas import Tokens
+from schemas.schemas import Tokens
 
 
 class AuthUser:

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from models import User
 from security.auth import AuthUser
 from security.header import api_key_header
-from schemas import UserLoginSchema, UserInfoSchema
+from schemas.schemas import UserLoginSchema, UserInfoSchema
 from security.simple_hash import password_hash
 
 router = APIRouter(

@@ -3,7 +3,7 @@ from typing import List
 from fastapi_pagination import Page, Params
 from fastapi_pagination.ext.tortoise import paginate
 
-from schemas import CategorySchema, TagSchema, PostViewSchema, PostCreateSchema
+from schemas.schemas import CategorySchema, TagSchema, PostViewSchema, PostCreateSchema
 from models import User, Category, Tag, Post
 from .common_query_params import CommonQueryParams
 from security.auth import AuthUser
