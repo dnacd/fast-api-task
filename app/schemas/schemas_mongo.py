@@ -13,6 +13,8 @@ class PostCreateSchemaMongo(BaseModel):
     author_id: int
     title: constr(max_length=55)
     slug: constr(max_length=35)
+    categories_id: list
+    tags_id: list
     content: str
     image: HttpUrl
     logged_only: bool
@@ -26,6 +28,8 @@ class PostCreateSchemaMongo(BaseModel):
                 "author_id": 1,
                 "title": "Title",
                 "slug": "Slug",
+                "categories_id": [],
+                "tags_id": [],
                 "content": "ContentString",
                 "image": "https://exampleimage.com/image.png",
                 "logged_only": False

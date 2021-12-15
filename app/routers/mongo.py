@@ -6,10 +6,10 @@ from security.auth import AuthUser
 from security.header import api_key_header
 
 from mongo.mongo_crud import content_crud
-from schemas_mongo import (PostCreateSchemaMongo, PostViewSchemaMongo,
-                           CommentCreateSchemaMongo, CommentListSchemaMongo,
-                           PostDetailViewSchemaMongo, TagListSchemaMongo,
-                           TagCreateSchemaMongo, CategoryCreateSchemaMongo, CategoryListSchemaMongo)
+from schemas.schemas_mongo import (PostCreateSchemaMongo, PostViewSchemaMongo,
+                                   CommentCreateSchemaMongo, CommentListSchemaMongo,
+                                   PostDetailViewSchemaMongo, TagListSchemaMongo,
+                                   TagCreateSchemaMongo, CategoryCreateSchemaMongo, CategoryListSchemaMongo)
 
 router = APIRouter(
     prefix="/mongo",

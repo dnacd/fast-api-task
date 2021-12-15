@@ -81,12 +81,12 @@ class ContentCRUD:
 
     async def add_category(self, category):
         category = jsonable_encoder(category)
-        data = await self.get_collection_by_name('category').insert_one(category)
-        created_category = await self.get_collection_by_name('category').find_one({"_id": data.inserted_id})
+        data = await self.get_collection_by_name('categories').insert_one(category)
+        created_category = await self.get_collection_by_name('categories').find_one({"_id": data.inserted_id})
         return created_category
 
     async def category_list(self):
-        data = await self.get_collection_by_name('category').find().to_list(10000)
+        data = await self.get_collection_by_name('categories').find().to_list(10000)
         return data
 
 
