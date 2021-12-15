@@ -35,18 +35,13 @@ class ContentCRUD:
         return created_post
 
     async def get_post_list(self, page_size, page_num, logged=False):
-        if (page_size and page_num) is None:
-            data = await self.get_collection().aggregate([{'$match': {'logged_only': False}}]).to_list(10000) if logged \
-                else await self.get_collection().find().to_list(10000)
-            return data
-        else:
+        unlogged = await self.get_collection().find({'logged_only': False}).to_list(10000)
+        if (page_size and page_num) is not None:
             skips = page_size * (page_num - 1)
-            data = self.get_collection().find().skip(skips).limit(page_size).to_list(10000) if logged else \
-                self.get_collection().aggregate([{'$match': {'logged_only': False}},
-                                                 {'$skip': skips},
-                                                 {'$limit': page_size}]).to_list(10000)
-            data = await data
-            count = await self.get_collection().count_documents({})
+            data = await self.get_collection().find().skip(skips).limit(page_size).to_list(10000) if logged \
+                else unlogged
+            count = await self.get_collection().count_documents({}) if logged \
+                else await self.get_collection().count_documents({'logged_only': False})
             items = {
                 "items": data,
                 "page_size": page_size,
@@ -55,6 +50,8 @@ class ContentCRUD:
                 "total_docs": count
             }
             return items
+        else:
+            return await self.get_collection().find().to_list(10000) if logged else unlogged
 
     async def update_post(self, post_id: str, update_data: dict):
         result = await self.get_collection().update_one({'_id': ObjectId(post_id)}, {'$set': update_data})
