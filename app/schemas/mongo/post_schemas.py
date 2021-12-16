@@ -43,7 +43,7 @@ class CatTagJoinSchemaMongo(BaseModel):
 
 
 class CommentsJoinSchemaMongo(BaseModel):
-    user_id: str
+    user_id: int
     text: str
 
 
