@@ -1,12 +1,12 @@
-def make_aggregation(logged=None, match_value=None, paginate=None, page_size=None, skips=None):
+def make_aggregation(logged=False, match_value=None, paginate=None, page_size=None, skips=None):
     aggregation = [{
-        "$lookup": {
-            "from": "comments",
-            "localField": "_id",
-            "foreignField": "post_id",
-            "as": "comments",
-        }
-    },
+            "$lookup": {
+                "from": "comments",
+                "localField": "_id",
+                "foreignField": "post_id",
+                "as": "comments",
+            }
+        },
         {
             "$lookup": {
                 "from": "tags",
@@ -23,7 +23,7 @@ def make_aggregation(logged=None, match_value=None, paginate=None, page_size=Non
                 "as": "categories",
             }
         }]
-    if logged is None:
+    if not logged:
         aggregation.append({"$match": {'logged_only': False}})
     if match_value:
         aggregation.append(match_value)
