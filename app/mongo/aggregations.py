@@ -29,5 +29,4 @@ def make_aggregation(logged=None, match_value=None, paginate=None, page_size=Non
         aggregation.append(match_value)
     if paginate:
         aggregation.extend([{"$skip": skips}, {"$limit": page_size}])
-
     return aggregation
