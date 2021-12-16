@@ -7,6 +7,8 @@ from config import Settings
 from mongo.db_mongo import get_mongo_db
 from .aggregations import make_aggregation
 
+from schemas.mongo.post_schemas import PostSchemaMongo
+
 mongo_db = get_mongo_db()
 
 
@@ -51,6 +53,10 @@ class ContentCRUD:
     async def get_post(self, post_id: str):
         data = await self.get_collection().aggregate([make_aggregation(), {"$match": {"_id": post_id}}]).to_list(1)
         return data
+
+    async def delete_post(self, post_id: str):
+        finder = {"_id": post_id}
+        return await self.get_collection().delete_one(finder)
 
     async def add_comment(self, comment):
         comment = jsonable_encoder(comment)
