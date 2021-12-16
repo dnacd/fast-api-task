@@ -12,7 +12,7 @@ from schemas.mongo.category_schemas import CategoryCreateSchemaMongo, CategoryLi
 from schemas.mongo.comment_schemas import CommentCreateSchemaMongo, CommentListSchemaMongo
 from schemas.mongo.post_detail_schemas import PostDetailViewSchemaMongo
 from schemas.mongo.post_schemas import PostCreateSchemaMongo, PostViewSchemaMongo, PostUpdateSchemaMongo, \
-    AfterUpdatePostSchemaMongo
+    UpdatePostSchemaMongo
 from schemas.mongo.tags_schemas import TagCreateSchemaMongo, TagListSchemaMongo
 
 router = APIRouter(
@@ -79,14 +79,12 @@ async def delete_post(post_id: str):
     raise HTTPException(status_code=404, detail=f"Post {post_id} not found")
 
 
-@router.put("/post/update/{post_id}", response_description="Post update", response_model=AfterUpdatePostSchemaMongo)
+@router.put("/post/update/{post_id}", response_description="Post update", response_model=UpdatePostSchemaMongo)
 async def post_update(post_id: str, post: PostUpdateSchemaMongo):
     updated_post = await content_crud.get_collection().update_one({"_id": post_id}, {"$set": post.dict()})
     post_body = await content_crud.get_collection().find_one({"_id": post_id})
     if updated_post:
         return post_body
-    else:
-        return "00000"
 
 
 @router.post("/add_comment", response_description="Add new comment", response_model=CommentCreateSchemaMongo)

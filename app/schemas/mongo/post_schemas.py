@@ -85,7 +85,7 @@ class PostUpdateSchemaMongo(BaseModel):
         }
 
 
-class AfterUpdatePostSchemaMongo(PostIdMixin):
+class UpdatePostSchemaMongo(PostIdMixin):
     post_id: str
     author_id: int
     title: constr(max_length=55)
