@@ -37,6 +37,7 @@ async def post_list_mongo(page: Optional[int] = None,
                      'tag_slug': {"$match": {"tags": {"$elemMatch": {"slug": common.tag_slug}}}},
                      'author_id': {"$match": {"author_id": common.author_id}}
                      }
+
     filter_value = None
     for key, value in condition_map.items():
         if getattr(common, key):
@@ -44,13 +45,14 @@ async def post_list_mongo(page: Optional[int] = None,
     logged = True if authorize.get_user_or_none() is not None else None
     count = await content_crud.get_collection().count_documents({}) if logged \
         else await content_crud.get_collection().count_documents({'logged_only': False})
-    if (page and size) is not None:
-        skips = size * (page - 1)
-        data = await content_crud.get_post_list(logged=logged, paginate=True, page_size=size, skips=skips,
-                                                filter_match=filter_value)
-    else:
-        data = await content_crud.get_post_list(logged=logged, filter_match=filter_value)
-
+    keyword_args = {
+        "logged": logged,
+        "paginate": True if (page and size) else None,
+        "page_size": size,
+        "skips": size * (page - 1) if size else None,
+        "filter_match": filter_value
+    }
+    data = await content_crud.get_post_list(**keyword_args)
     items = {
         "items": data,
         "total_docs": count,
