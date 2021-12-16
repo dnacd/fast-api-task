@@ -51,12 +51,13 @@ class ContentCRUD:
         return result
 
     async def get_post(self, post_id: str):
-        data = await self.get_collection().aggregate([make_aggregation(), {"$match": {"_id": post_id}}]).to_list(1)
+        data = await self.get_collection().aggregate([*make_aggregation(), {"$match": {"_id": post_id}}]).to_list(1)
         return data
 
     async def delete_post(self, post_id: str):
         finder = {"_id": post_id}
-        return await self.get_collection().delete_one(finder)
+        data = await self.get_collection().delete_one(finder)
+        return data
 
     async def add_comment(self, comment):
         comment = jsonable_encoder(comment)

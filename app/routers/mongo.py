@@ -11,7 +11,8 @@ from mongo.mongo_crud import content_crud
 from schemas.mongo.category_schemas import CategoryCreateSchemaMongo, CategoryListSchemaMongo
 from schemas.mongo.comment_schemas import CommentCreateSchemaMongo, CommentListSchemaMongo
 from schemas.mongo.post_detail_schemas import PostDetailViewSchemaMongo
-from schemas.mongo.post_schemas import PostCreateSchemaMongo, PostViewSchemaMongo
+from schemas.mongo.post_schemas import PostCreateSchemaMongo, PostViewSchemaMongo, PostUpdateSchemaMongo, \
+    AfterUpdatePostSchemaMongo
 from schemas.mongo.tags_schemas import TagCreateSchemaMongo, TagListSchemaMongo
 
 router = APIRouter(
@@ -70,12 +71,22 @@ async def post_detail_mongo(post_id: str):
     return data
 
 
-@router.delete("/post/delete/{id}", response_description="Delete a student")
+@router.delete("/post/delete/{post_id}", response_description="Delete a student")
 async def delete_post(post_id: str):
     delete_result = await content_crud.delete_post(post_id)
     if delete_result.deleted_count == 1:
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
-    raise HTTPException(status_code=404, detail=f"Student {post_id} not found")
+    raise HTTPException(status_code=404, detail=f"Post {post_id} not found")
+
+
+@router.put("/post/update/{post_id}", response_description="Post update", response_model=AfterUpdatePostSchemaMongo)
+async def post_update(post_id: str, post: PostUpdateSchemaMongo):
+    updated_post = await content_crud.get_collection().update_one({"_id": post_id}, {"$set": post.dict()})
+    post_body = await content_crud.get_collection().find_one({"_id": post_id})
+    if updated_post:
+        return post_body
+    else:
+        return "00000"
 
 
 @router.post("/add_comment", response_description="Add new comment", response_model=CommentCreateSchemaMongo)

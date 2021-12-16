@@ -60,3 +60,38 @@ class PostViewSchemaMongo(BaseModel):
     page_num: Optional[int]
     total_pages: Optional[int]
     total_docs: Optional[int]
+
+
+class PostUpdateSchemaMongo(BaseModel):
+    title: constr(max_length=80)
+    slug: constr(max_length=35)
+    categories_id: List[str]
+    tags_id: List[str]
+    content: str
+    image: HttpUrl
+    logged_only: bool
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "title": "Title",
+                "slug": "slugfield",
+                "categories_id": ["ObjectId", "ObjectId"],
+                "tags_id": ["ObjectId", "ObjectId"],
+                "content": "ContentString",
+                "image": "https://exampleimage.com/image.png",
+                "logged_only": False
+            }
+        }
+
+
+class AfterUpdatePostSchemaMongo(PostIdMixin):
+    post_id: str
+    author_id: int
+    title: constr(max_length=55)
+    slug: constr(max_length=35)
+    image: HttpUrl
+    created: datetime.datetime
+    logged_only: bool
+    categories_id: List
+    tags_id: List
