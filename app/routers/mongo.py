@@ -1,15 +1,15 @@
 from math import ceil
 from typing import Optional, List
 from fastapi import APIRouter, Depends
-
 from security.auth import AuthUser
 from security.header import api_key_header
 
 from mongo.mongo_crud import content_crud
-from schemas.schemas_mongo import (PostCreateSchemaMongo, PostViewSchemaMongo,
-                                   CommentCreateSchemaMongo, CommentListSchemaMongo,
-                                   PostDetailViewSchemaMongo, TagListSchemaMongo,
-                                   TagCreateSchemaMongo, CategoryCreateSchemaMongo, CategoryListSchemaMongo)
+from schemas.mongo.category_schema import CategoryCreateSchemaMongo, CategoryListSchemaMongo
+from schemas.mongo.comment_schema import CommentCreateSchemaMongo, CommentListSchemaMongo
+from schemas.mongo.post_detail_schema import PostDetailViewSchemaMongo
+from schemas.mongo.post_schemas import PostCreateSchemaMongo, PostViewSchemaMongo
+from schemas.mongo.tags_schema import TagCreateSchemaMongo, TagListSchemaMongo
 
 router = APIRouter(
     prefix="/mongo",
@@ -24,13 +24,9 @@ async def create_post(post: PostCreateSchemaMongo):
     return PostCreateSchemaMongo.dict(post)
 
 
-@router.get("/post_list",
-            response_description="List of posts",
-            dependencies=(api_key_header,),
+@router.get("/post_list", response_description="List of posts", dependencies=(api_key_header,),
             response_model=PostViewSchemaMongo)
-async def post_list_mongo(page: Optional[int] = None,
-                          size: Optional[int] = None,
-                          authorize: AuthUser = Depends()):
+async def post_list_mongo(page: Optional[int] = None, size: Optional[int] = None, authorize: AuthUser = Depends()):
     await authorize.requires_access_token(required=False)
     logged = True if authorize.get_user_or_none() is not None else None
     count = await content_crud.get_collection().count_documents({}) if logged \
@@ -48,7 +44,7 @@ async def post_list_mongo(page: Optional[int] = None,
         "page_size": size,
         "page_num": page,
         "total_pages": (ceil(count / size)) if pag else None
-        }
+    }
     return items
 
 
@@ -95,4 +91,3 @@ async def category_list():
     data = await content_crud.category_list()
     items = {"categories": data}
     return items
-
