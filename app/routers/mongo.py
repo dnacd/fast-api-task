@@ -1,6 +1,8 @@
 from math import ceil
 from typing import Optional, List
 from fastapi import APIRouter, Depends
+
+from routers.common_query_params import CommonQueryParams
 from security.auth import AuthUser
 from security.header import api_key_header
 
@@ -26,24 +28,35 @@ async def create_post(post: PostCreateSchemaMongo):
 
 @router.get("/post_list", response_description="List of posts", dependencies=(api_key_header,),
             response_model=PostViewSchemaMongo)
-async def post_list_mongo(page: Optional[int] = None, size: Optional[int] = None, authorize: AuthUser = Depends()):
+async def post_list_mongo(page: Optional[int] = None,
+                          size: Optional[int] = None,
+                          authorize: AuthUser = Depends(),
+                          common: CommonQueryParams = Depends(CommonQueryParams)):
     await authorize.requires_access_token(required=False)
+    condition_map = {'category_slug': {"$match": {"categories": {"$elemMatch": {"slug": common.category_slug}}}},
+                     'tag_slug': {"$match": {"tags": {"$elemMatch": {"slug": common.tag_slug}}}},
+                     'author_id': {"$match": {"author_id": common.author_id}}
+                     }
+    filter_value = None
+    for key, value in condition_map.items():
+        if getattr(common, key):
+            filter_value = value
     logged = True if authorize.get_user_or_none() is not None else None
     count = await content_crud.get_collection().count_documents({}) if logged \
         else await content_crud.get_collection().count_documents({'logged_only': False})
-    pag = 0
     if (page and size) is not None:
-        pag = 1
         skips = size * (page - 1)
-        data = await content_crud.get_post_list(logged=logged, paginate=True, page_size=size, skips=skips)
+        data = await content_crud.get_post_list(logged=logged, paginate=True, page_size=size, skips=skips,
+                                                filter_match=filter_value)
     else:
-        data = await content_crud.get_post_list(logged=logged)
+        data = await content_crud.get_post_list(logged=logged, filter_match=filter_value)
+
     items = {
         "items": data,
         "total_docs": count,
         "page_size": size,
         "page_num": page,
-        "total_pages": (ceil(count / size)) if pag else None
+        "total_pages": (ceil(count / size)) if size else None
     }
     return items
 
