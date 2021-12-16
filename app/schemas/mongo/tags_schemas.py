@@ -1,7 +1,7 @@
 from bson import ObjectId
 from pydantic import BaseModel
 from typing import List
-from mongo.pyobj_id import PyObjectId
+from mongo.valitators import PyObjectId
 
 from pydantic.fields import Field
 

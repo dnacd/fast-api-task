@@ -10,4 +10,3 @@ class CommonQueryParams:
         self.author_id = author_id
         self.category_slug = category_slug
         self.tag_slug = tag_slug
-

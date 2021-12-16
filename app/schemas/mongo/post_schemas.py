@@ -2,7 +2,7 @@ import datetime
 from bson import ObjectId
 from pydantic import BaseModel, constr, HttpUrl
 from typing import Optional, List
-from mongo.pyobj_id import PyObjectId
+from mongo.valitators import PyObjectId
 
 from pydantic.fields import Field
 from mongo.mixins import PostIdMixin
@@ -37,6 +37,11 @@ class PostCreateSchemaMongo(BaseModel):
         }
 
 
+class CatTagJoinSchemaMongo(BaseModel):
+    title: str
+    slug: str
+
+
 class PostSchemaMongo(PostIdMixin):
     post_id: str
     author_id: int
@@ -45,8 +50,8 @@ class PostSchemaMongo(PostIdMixin):
     image: HttpUrl
     created: datetime.datetime
     logged_only: bool
-    categories_id: List
-    tags_id: List
+    categories: List[CatTagJoinSchemaMongo]
+    tags: List[CatTagJoinSchemaMongo]
 
 
 class PostViewSchemaMongo(BaseModel):
