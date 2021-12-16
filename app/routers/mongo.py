@@ -1,6 +1,7 @@
 from math import ceil
 from typing import Optional, List
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 
 from routers.common_query_params import CommonQueryParams
 from security.auth import AuthUser
@@ -32,12 +33,12 @@ async def post_list_mongo(page: Optional[int] = None,
                           size: Optional[int] = None,
                           authorize: AuthUser = Depends(),
                           common: CommonQueryParams = Depends(CommonQueryParams)):
+
     await authorize.requires_access_token(required=False)
     condition_map = {'category_slug': {"$match": {"categories": {"$elemMatch": {"slug": common.category_slug}}}},
                      'tag_slug': {"$match": {"tags": {"$elemMatch": {"slug": common.tag_slug}}}},
                      'author_id': {"$match": {"author_id": common.author_id}}
                      }
-
     filter_value = None
     for key, value in condition_map.items():
         if getattr(common, key):
@@ -67,6 +68,14 @@ async def post_list_mongo(page: Optional[int] = None,
 async def post_detail_mongo(post_id: str):
     data = await content_crud.get_post(post_id=post_id)
     return data
+
+
+@router.delete("/post/delete/{id}", response_description="Delete a student")
+async def delete_post(post_id: str):
+    delete_result = await content_crud.delete_post(post_id)
+    if delete_result.deleted_count == 1:
+        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
+    raise HTTPException(status_code=404, detail=f"Student {post_id} not found")
 
 
 @router.post("/add_comment", response_description="Add new comment", response_model=CommentCreateSchemaMongo)
