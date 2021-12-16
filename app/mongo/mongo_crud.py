@@ -53,10 +53,27 @@ class ContentCRUD:
                     "localField": "_id",
                     "foreignField": "post_id",
                     "as": "comments",
-                },
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "tags",
+                    "localField": "post_id",
+                    "foreignField": "tags_id",
+                    "as": "tags",
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "categories",
+                    "localField": "post_id",
+                    "foreignField": "categories_id",
+                    "as": "categories",
+                }
             },
             {"$match": {"_id": post_id}}
         ]).to_list(1)
+        print(data)
         return data
 
     async def add_comment(self, comment):
