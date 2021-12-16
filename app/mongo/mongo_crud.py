@@ -5,6 +5,7 @@ from functools import lru_cache
 
 from config import Settings
 from mongo.db_mongo import get_mongo_db
+from .aggregations import make_aggregation
 
 mongo_db = get_mongo_db()
 
@@ -33,12 +34,14 @@ class ContentCRUD:
         created_post = await self.get_collection().find_one({"_id": data.inserted_id})
         return created_post
 
-    async def get_post_list(self, logged=False, paginate=False, page_size=None, skips=None):
-        queryset = self.get_collection().find() if logged else self.get_collection().find({'logged_only': False})
-        if paginate:
-            data = await queryset.skip(skips).limit(page_size).to_list(10000)
-        else:
-            data = await queryset.to_list(10000)
+    async def get_post_list(self, logged=False, paginate=False, page_size=None, skips=None, filter_match=None):
+        keyword_args = {
+            "logged": logged,
+            "paginate": paginate,
+            "page_size": page_size,
+            "skips": skips,
+            "match_value": filter_match}
+        data = await self.get_collection().aggregate(make_aggregation(**keyword_args)).to_list(10000)
         return data
 
     async def update_post(self, post_id: str, update_data: dict):
@@ -46,34 +49,7 @@ class ContentCRUD:
         return result
 
     async def get_post(self, post_id: str):
-        data = await self.get_collection().aggregate([
-            {
-                "$lookup": {
-                    "from": "comments",
-                    "localField": "_id",
-                    "foreignField": "post_id",
-                    "as": "comments",
-                }
-            },
-            {
-                "$lookup": {
-                    "from": "tags",
-                    "localField": "post_id",
-                    "foreignField": "tags_id",
-                    "as": "tags",
-                }
-            },
-            {
-                "$lookup": {
-                    "from": "categories",
-                    "localField": "post_id",
-                    "foreignField": "categories_id",
-                    "as": "categories",
-                }
-            },
-            {"$match": {"_id": post_id}}
-        ]).to_list(1)
-        print(data)
+        data = await self.get_collection().aggregate([make_aggregation(), {"$match": {"_id": post_id}}]).to_list(1)
         return data
 
     async def add_comment(self, comment):
