@@ -42,6 +42,11 @@ class CatTagJoinSchemaMongo(BaseModel):
     slug: str
 
 
+class CommentsJoinSchemaMongo(BaseModel):
+    user_id: str
+    text: str
+
+
 class PostSchemaMongo(PostIdMixin):
     post_id: str
     author_id: int
@@ -50,6 +55,7 @@ class PostSchemaMongo(PostIdMixin):
     image: HttpUrl
     created: datetime.datetime
     logged_only: bool
+    comments: List[CommentsJoinSchemaMongo]
     categories: List[CatTagJoinSchemaMongo]
     tags: List[CatTagJoinSchemaMongo]
 
