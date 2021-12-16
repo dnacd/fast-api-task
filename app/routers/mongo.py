@@ -5,11 +5,11 @@ from security.auth import AuthUser
 from security.header import api_key_header
 
 from mongo.mongo_crud import content_crud
-from schemas.mongo.category_schema import CategoryCreateSchemaMongo, CategoryListSchemaMongo
-from schemas.mongo.comment_schema import CommentCreateSchemaMongo, CommentListSchemaMongo
-from schemas.mongo.post_detail_schema import PostDetailViewSchemaMongo
+from schemas.mongo.category_schemas import CategoryCreateSchemaMongo, CategoryListSchemaMongo
+from schemas.mongo.comment_schemas import CommentCreateSchemaMongo, CommentListSchemaMongo
+from schemas.mongo.post_detail_schemas import PostDetailViewSchemaMongo
 from schemas.mongo.post_schemas import PostCreateSchemaMongo, PostViewSchemaMongo
-from schemas.mongo.tags_schema import TagCreateSchemaMongo, TagListSchemaMongo
+from schemas.mongo.tags_schemas import TagCreateSchemaMongo, TagListSchemaMongo
 
 router = APIRouter(
     prefix="/mongo",

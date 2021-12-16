@@ -27,9 +27,9 @@ class PostCreateSchemaMongo(BaseModel):
             "example": {
                 "author_id": 1,
                 "title": "Title",
-                "slug": "Slug",
-                "categories_id": ["ObjectId, ObjectId..."],
-                "tags_id": ["ObjectId", "ObjectId..."],
+                "slug": "slugfield",
+                "categories_id": ["ObjectId", "ObjectId"],
+                "tags_id": ["ObjectId", "ObjectId"],
                 "content": "ContentString",
                 "image": "https://exampleimage.com/image.png",
                 "logged_only": False
