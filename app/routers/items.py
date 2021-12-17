@@ -11,8 +11,8 @@ from security.header import api_key_header
 
 
 router = APIRouter(
-    prefix="/items",
-    tags=["items"],
+    prefix="/postgres",
+    tags=["postgres"],
     responses={404: {"description": "Not found"}},
 )
 

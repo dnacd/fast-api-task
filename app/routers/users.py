@@ -7,15 +7,15 @@ from security.simple_hash import password_hash
 
 router = APIRouter(
     prefix="/user",
-    tags=["items"],
+    tags=["user"],
     responses={404: {"description": "Not found"}},
 )
 
 
 @router.get("/list", response_model=List[ViewListUserSchema])
 async def get_users() -> List:
-    queryset = await User.all()
-    return [ViewListUserSchema.from_orm(model) for model in queryset]
+    data = await User.all()
+    return [ViewListUserSchema.from_orm(model) for model in data]
 
 
 @router.get("/{user_id}", status_code=200, response_model=UserInfoSchema)

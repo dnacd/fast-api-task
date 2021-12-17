@@ -7,7 +7,7 @@ from config import Settings
 from mongo.db_mongo import get_mongo_db
 from .aggregations import make_aggregation
 
-from schemas.mongo.post_schemas import PostSchemaMongo
+from schemas.mongo.post_schemas import PostSchema
 
 mongo_db = get_mongo_db()
 
@@ -44,7 +44,7 @@ class ContentCRUD:
             "skips": skips,
             "match_value": filter_match}
         data = await self.get_collection().aggregate(make_aggregation(**keyword_args)).to_list(10000)
-        return data
+        return [PostSchema(**one) for one in data]
 
     async def update_post(self, post_id: str, update_data: dict):
         result = await self.get_collection().update_one({'_id': ObjectId(post_id)}, {'$set': update_data})
@@ -52,7 +52,7 @@ class ContentCRUD:
 
     async def get_post(self, post_id: str):
         data = await self.get_collection().aggregate([*make_aggregation(), {"$match": {"_id": post_id}}]).to_list(1)
-        return data
+        return PostSchema(**data[0])
 
     async def delete_post(self, post_id: str):
         finder = {"_id": post_id}

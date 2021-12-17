@@ -1,12 +1,13 @@
 from bson import ObjectId
 from pydantic import BaseModel
 from typing import List
-from mongo.valitators import PyObjectId
 
+
+from mongo.valitators import PyObjectId
 from pydantic.fields import Field
 
 
-class CommentCreateSchemaMongo(BaseModel):
+class CommentCreateSchema(BaseModel):
     id: PyObjectId = Field(default_factory=ObjectId, alias='_id')
     post_id: str
     user_id: int
@@ -25,11 +26,11 @@ class CommentCreateSchemaMongo(BaseModel):
         }
 
 
-class CommentViewSchemaMongo(BaseModel):
+class CommentViewSchema(BaseModel):
     post_id: str
     user_id: int
     text: str
 
 
 class CommentListSchemaMongo(BaseModel):
-    comments: List[CommentViewSchemaMongo]
+    comments: List[CommentViewSchema]

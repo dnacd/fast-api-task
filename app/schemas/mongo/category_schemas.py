@@ -6,7 +6,7 @@ from mongo.valitators import PyObjectId
 from pydantic.fields import Field
 
 
-class CategoryCreateSchemaMongo(BaseModel):
+class CategoryCreateSchema(BaseModel):
     id: PyObjectId = Field(default_factory=ObjectId, alias='_id')
     title: str
     slug: str
@@ -23,11 +23,11 @@ class CategoryCreateSchemaMongo(BaseModel):
         }
 
 
-class CategoryDetailSchemaMongo(BaseModel):
+class CategoryDetailSchema(BaseModel):
     id: str = Field(alias='_id')
     title: str
     slug: str
 
 
-class CategoryListSchemaMongo(BaseModel):
-    categories: List[CategoryDetailSchemaMongo]
+class CategoryListSchema(BaseModel):
+    categories: List[CategoryDetailSchema]

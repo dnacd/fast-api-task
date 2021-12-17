@@ -2,30 +2,22 @@ from pydantic import BaseModel, constr, HttpUrl
 from typing import List
 
 from mongo.mixins import PostIdMixin
+from .post_schemas import CatTagJoinSchema
 
 
-class TagsJoinSchemaMongo(BaseModel):
-    title: str
-    slug: str
-
-
-class CategoriesJoinSchemaMongo(BaseModel):
-    title: str
-    slug: str
-
-
-class CommentsJoinSchemaMongo(BaseModel):
+class CommentsJoinSchema(BaseModel):
     user_id: int
     text: str
 
 
-class PostDetailViewSchemaMongo(PostIdMixin):
+class PostDetailViewSchema(PostIdMixin):
     post_id: str
     author_id: int
+    author: str
     title: constr(max_length=55)
     slug: constr(max_length=35)
     image: HttpUrl
     logged_only: bool
-    comments: List[CommentsJoinSchemaMongo]
-    tags: List[TagsJoinSchemaMongo]
-    categories: List[CategoriesJoinSchemaMongo]
+    comments: List[CommentsJoinSchema]
+    tags: List[CatTagJoinSchema]
+    categories: List[CatTagJoinSchema]

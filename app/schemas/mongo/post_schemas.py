@@ -8,7 +8,7 @@ from pydantic.fields import Field
 from mongo.mixins import PostIdMixin
 
 
-class PostCreateSchemaMongo(BaseModel):
+class PostCreateSchema(BaseModel):
     id: PyObjectId = Field(default_factory=ObjectId, alias='_id')
     author_id: int
     title: constr(max_length=80)
@@ -37,38 +37,52 @@ class PostCreateSchemaMongo(BaseModel):
         }
 
 
-class CatTagJoinSchemaMongo(BaseModel):
+class CatTagJoinSchema(BaseModel):
     title: str
     slug: str
 
 
-class CommentsJoinSchemaMongo(BaseModel):
+class ViewListUserSchema(BaseModel):
+    id: int
+    username: constr(max_length=24)
+
+    class Config:
+        orm_mode = True
+
+
+class UserInAggregationSchema(BaseModel):
+    username: constr(max_length=24)
+
+
+class CommentsJoinSchema(BaseModel):
     user_id: int
+    username: Optional[str]
     text: str
 
 
-class PostSchemaMongo(PostIdMixin):
+class PostSchema(PostIdMixin):
     post_id: str
     author_id: int
+    author: Optional[UserInAggregationSchema]
     title: constr(max_length=55)
     slug: constr(max_length=35)
     image: HttpUrl
     created: datetime.datetime
     logged_only: bool
-    comments: List[CommentsJoinSchemaMongo]
-    categories: List[CatTagJoinSchemaMongo]
-    tags: List[CatTagJoinSchemaMongo]
+    comments: List[CommentsJoinSchema]
+    categories: List[CatTagJoinSchema]
+    tags: List[CatTagJoinSchema]
 
 
-class PostViewSchemaMongo(BaseModel):
-    items: List[PostSchemaMongo]
+class PostViewSchema(BaseModel):
+    items: List[PostSchema]
     page_size: Optional[int]
     page_num: Optional[int]
     total_pages: Optional[int]
     total_docs: Optional[int]
 
 
-class PostUpdateSchemaMongo(BaseModel):
+class PostUpdateSchema(BaseModel):
     title: constr(max_length=80)
     slug: constr(max_length=35)
     categories_id: List[str]
@@ -91,7 +105,7 @@ class PostUpdateSchemaMongo(BaseModel):
         }
 
 
-class UpdatePostSchemaMongo(PostIdMixin):
+class ResponseUpdatePostSchema(PostIdMixin):
     post_id: str
     author_id: int
     title: constr(max_length=55)

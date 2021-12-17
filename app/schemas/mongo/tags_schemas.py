@@ -1,12 +1,13 @@
 from bson import ObjectId
 from pydantic import BaseModel
 from typing import List
-from mongo.valitators import PyObjectId
 
+
+from mongo.valitators import PyObjectId
 from pydantic.fields import Field
 
 
-class TagCreateSchemaMongo(BaseModel):
+class TagCreateSchema(BaseModel):
     id: PyObjectId = Field(default_factory=ObjectId, alias='_id')
     title: str
     slug: str
@@ -23,11 +24,11 @@ class TagCreateSchemaMongo(BaseModel):
         }
 
 
-class TagDetailSchemaMongo(BaseModel):
+class TagDetailSchema(BaseModel):
     id: str = Field(alias='_id')
     title: str
     slug: str
 
 
-class TagListSchemaMongo(BaseModel):
-    tags: List[TagDetailSchemaMongo]
+class TagListSchema(BaseModel):
+    tags: List[TagDetailSchema]
