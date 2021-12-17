@@ -12,9 +12,9 @@ def merge_helper(data, users_dict):
 async def merge_user_data(data, single=False):
     users = [ViewListUserSchema.from_orm(user) for user in await User.all()]
     users_dict = {user.id: user for user in users}
-    if not single:
-        for post in data:
-            merge_helper(post, users_dict)
-    else:
+    if single:
         merge_helper(data, users_dict)
+        return data
+    for post in data:
+        merge_helper(post, users_dict)
     return data
