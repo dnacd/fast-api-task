@@ -1,9 +1,8 @@
 from math import ceil
-from typing import Optional, List
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 
-from models import User
 from routers.common_query_params import CommonQueryParams
 from security.auth import AuthUser
 from security.header import api_key_header
@@ -11,9 +10,8 @@ from security.header import api_key_header
 from mongo.mongo_crud import content_crud
 from schemas.mongo.category_schemas import CategoryCreateSchema, CategoryListSchema
 from schemas.mongo.comment_schemas import CommentCreateSchema, CommentListSchemaMongo
-from schemas.mongo.post_detail_schemas import PostDetailViewSchema
 from schemas.mongo.post_schemas import PostCreateSchema, PostViewSchema, PostUpdateSchema, \
-    ResponseUpdatePostSchema, ViewListUserSchema, PostSchema
+    ResponseUpdatePostSchema, PostSchema
 from schemas.mongo.tags_schemas import TagCreateSchema, TagListSchema
 from mongo.pg_mongo_aggregation import merge_user_data
 
