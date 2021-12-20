@@ -8,11 +8,7 @@ from security.auth import AuthUser
 from security.header import api_key_header
 
 from mongo.mongo_crud import content_crud
-from schemas.mongo.category_schemas import CategoryCreateSchema, CategoryListSchema
-from schemas.mongo.comment_schemas import CommentCreateSchema, CommentListSchemaMongo
-from schemas.mongo.post_schemas import PostCreateSchema, PostViewSchema, PostUpdateSchema, \
-    ResponseUpdatePostSchema, PostSchema
-from schemas.mongo.tags_schemas import TagCreateSchema, TagListSchema
+from schemas.mongo import *
 from mongo.pg_mongo_aggregation import merge_user_data
 
 router = APIRouter(
@@ -22,10 +18,10 @@ router = APIRouter(
 )
 
 
-@router.post("/new_post", response_description="Create new Post", response_model=PostCreateSchema)
-async def create_post(post: PostCreateSchema):
-    await content_crud.new_post(post)
-    return PostCreateSchema.dict(post)
+@router.post("/new_post", response_description="Create new Post", response_model=ResponsePostCreateSchema)
+async def create_post(post: RequestPostCreateSchema):
+    data = await content_crud.new_post(post)
+    return data
 
 
 @router.get("/post_list", response_description="List of posts", dependencies=(api_key_header,),
@@ -63,7 +59,7 @@ async def post_list_mongo(page: Optional[int] = None,  size: Optional[int] = Non
     return items
 
 
-@router.get("/post/{post_id}", response_description="Post Detail", response_model=PostSchema)
+@router.get("/post/{post_id}", response_description="Post Detail", response_model=ResponsePostSchema)
 async def post_detail_mongo(post_id: str):
     data = await content_crud.get_post(post_id=post_id)
     await merge_user_data(data, single=True)
@@ -79,46 +75,46 @@ async def delete_post(post_id: str):
 
 
 @router.put("/post/update/{post_id}", response_description="Post update", response_model=ResponseUpdatePostSchema)
-async def post_update(post_id: str, post: PostUpdateSchema):
+async def post_update(post_id: str, post: RequestPostUpdateSchema):
     updated_post = await content_crud.get_collection().update_one({"_id": post_id}, {"$set": post.dict()})
     post_body = await content_crud.get_collection().find_one({"_id": post_id})
     if updated_post:
         return post_body
 
 
-@router.post("/add_comment", response_description="Add new comment", response_model=CommentCreateSchema)
-async def new_comment(comment: CommentCreateSchema):
-    await content_crud.add_comment(comment)
-    return CommentCreateSchema.dict(comment)
+@router.post("/add_comment", response_description="Add new comment", response_model=ResponseCommentSchema)
+async def new_comment(comment: RequestCommentCreateSchema):
+    data = await content_crud.add_comment(comment)
+    return data
 
 
-@router.get("/comment_list", response_description="All comments", response_model=CommentListSchemaMongo)
+@router.get("/comment_list", response_description="All comments", response_model=ResponseCommentListSchema)
 async def comment_list():
     data = await content_crud.comment_list()
     items = {"comments": data}
     return items
 
 
-@router.post("/add_tag", response_description="Add tag", response_model=TagCreateSchema)
-async def add_tag(tag: TagCreateSchema):
-    await content_crud.add_tag(tag)
-    return CommentCreateSchema.dict(tag)
+@router.post("/add_tag", response_description="Add tag", response_model=ResponseTagSchema)
+async def add_tag(tag: RequestTagCreateSchema):
+    data = await content_crud.add_tag(tag)
+    return data
 
 
-@router.get("/tag_list", response_description="All tags", response_model=TagListSchema)
+@router.get("/tag_list", response_description="All tags", response_model=ResponseTagListSchema)
 async def tag_list():
     data = await content_crud.tag_list()
     items = {"tags": data}
     return items
 
 
-@router.post("/add_category", response_description="Add category", response_model=CategoryCreateSchema)
-async def add_category(category: CategoryCreateSchema):
-    await content_crud.add_category(category)
-    return CategoryCreateSchema.dict(category)
+@router.post("/add_category", response_description="Add category", response_model=ResponseCategorySchema)
+async def add_category(category: RequestCategoryCreateSchema):
+    data = await content_crud.add_category(category)
+    return data
 
 
-@router.get("/category_list", response_description="All categories", response_model=CategoryListSchema)
+@router.get("/category_list", response_description="All categories", response_model=ResponseCategoryListSchema)
 async def category_list():
     data = await content_crud.category_list()
     items = {"categories": data}

@@ -1,20 +1,16 @@
 from bson import ObjectId
 from pydantic import BaseModel
 from typing import List
-from mongo.valitators import PyObjectId
+from mongo.mixins import CategoryIdMixin
 
 from pydantic.fields import Field
 
 
-class CategoryCreateSchema(BaseModel):
-    id: PyObjectId = Field(default_factory=ObjectId, alias='_id')
+class RequestCategoryCreateSchema(BaseModel):
     title: str
     slug: str
 
     class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "title": "title",
@@ -23,11 +19,22 @@ class CategoryCreateSchema(BaseModel):
         }
 
 
-class CategoryDetailSchema(BaseModel):
-    id: str = Field(alias='_id')
+class CategoryCreateDBSchema(CategoryIdMixin):
+    category_id: str
+    title: str
+    slug: str
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
+class ResponseCategorySchema(CategoryIdMixin):
+    category_id: str
     title: str
     slug: str
 
 
-class CategoryListSchema(BaseModel):
-    categories: List[CategoryDetailSchema]
+class ResponseCategoryListSchema(BaseModel):
+    categories: List[ResponseCategorySchema]

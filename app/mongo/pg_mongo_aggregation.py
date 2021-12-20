@@ -1,5 +1,5 @@
 from models import User
-from schemas.mongo.post_schemas import ViewListUserSchema
+from schemas.mongo.post_schemas import ResponseUserSchema
 
 
 def merge_helper(data, users_dict):
@@ -10,7 +10,7 @@ def merge_helper(data, users_dict):
 
 
 async def merge_user_data(data, single=False):
-    users = [ViewListUserSchema.from_orm(user) for user in await User.all()]
+    users = [ResponseUserSchema.from_orm(user) for user in await User.all()]
     users_dict = {user.id: user for user in users}
     if single:
         merge_helper(data, users_dict)

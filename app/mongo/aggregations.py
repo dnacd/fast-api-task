@@ -1,4 +1,4 @@
-def make_aggregation(logged=False, match_value=None, paginate=None, page_size=None, skips=None):
+def make_aggregation(logged=False, match_value=None, paginate=None, page_size=None, skips=None, finder=False):
     aggregation = [{
             "$lookup": {
                 "from": "comments",
@@ -29,4 +29,6 @@ def make_aggregation(logged=False, match_value=None, paginate=None, page_size=No
         aggregation.append(match_value)
     if paginate:
         aggregation.extend([{"$skip": skips}, {"$limit": page_size}])
+    if finder:
+        aggregation.append(finder)
     return aggregation

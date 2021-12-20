@@ -1,22 +1,17 @@
-from bson import ObjectId
-from pydantic import BaseModel
 from typing import List
 
+from bson import ObjectId
+from pydantic import BaseModel
 
-from mongo.valitators import PyObjectId
-from pydantic.fields import Field
+from mongo.mixins import CommentsIdMixin
 
 
-class CommentCreateSchema(BaseModel):
-    id: PyObjectId = Field(default_factory=ObjectId, alias='_id')
+class RequestCommentCreateSchema(BaseModel):
     post_id: str
     user_id: int
     text: str
 
     class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "post_id": "mongo_obj_id",
@@ -26,11 +21,24 @@ class CommentCreateSchema(BaseModel):
         }
 
 
-class CommentViewSchema(BaseModel):
+class CommentCreateDBSchema(CommentsIdMixin):
+    comment_id: str
+    post_id: str
+    user_id: int
+    text: str
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
+class ResponseCommentSchema(CommentsIdMixin):
+    comment_id: str
     post_id: str
     user_id: int
     text: str
 
 
-class CommentListSchemaMongo(BaseModel):
-    comments: List[CommentViewSchema]
+class ResponseCommentListSchema(BaseModel):
+    comments: List[ResponseCommentSchema]
