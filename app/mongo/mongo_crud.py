@@ -54,7 +54,6 @@ class ContentCRUD:
     async def get_post(self, post_id: str) -> ResponsePostSchema:
         finder = {"$match": {"_id": ObjectId(post_id)}}
         data = await self.get_collection().aggregate(make_aggregation(finder=finder)).to_list(1)
-        print(data[0])
         return ResponsePostSchema(**data[0])
 
     async def delete_post(self, post_id: str):

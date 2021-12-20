@@ -1,9 +1,8 @@
 from bson import ObjectId
 from pydantic import BaseModel
 from typing import List
-from mongo.mixins import CategoryIdMixin
 
-from pydantic.fields import Field
+from mongo.mixins import CategoryIdMixin
 
 
 class RequestCategoryCreateSchema(BaseModel):

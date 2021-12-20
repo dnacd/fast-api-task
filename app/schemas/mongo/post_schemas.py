@@ -13,7 +13,7 @@ class RequestPostCreateSchema(BaseModel):
     categories_id: List[str]
     tags_id: List[str]
     content: str
-    image: HttpUrl
+    image: Optional[str]
     logged_only: bool
 
     class Config:
@@ -25,7 +25,6 @@ class RequestPostCreateSchema(BaseModel):
                 "categories_id": ["ObjectId", "ObjectId"],
                 "tags_id": ["ObjectId", "ObjectId"],
                 "content": "ContentString",
-                "image": "https://exampleimage.com/image.png",
                 "logged_only": False
             }
         }
@@ -39,7 +38,7 @@ class PostCreateDBSchema(PostIdMixin):
     categories_id: List[str]
     tags_id: List[str]
     content: str
-    image: HttpUrl
+    image: Optional[HttpUrl]
     logged_only: bool
 
     class Config:

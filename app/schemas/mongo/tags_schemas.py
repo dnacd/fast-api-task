@@ -3,8 +3,6 @@ from pydantic import BaseModel
 from typing import List
 
 from mongo.mixins import TagIdMixin
-from mongo.valitators import PyObjectId
-from pydantic.fields import Field
 
 
 class RequestTagCreateSchema(BaseModel):

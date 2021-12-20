@@ -19,6 +19,8 @@ router = APIRouter(
     operation_id="get_user_profile",
     dependencies=(api_key_header,)
 )
+
+
 async def get_profile_settings(
         authorize: AuthUser = Depends(),
 ):

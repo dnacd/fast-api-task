@@ -1,15 +1,17 @@
 from math import ceil
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from fastapi.responses import JSONResponse
 
 from routers.common_query_params import CommonQueryParams
 from security.auth import AuthUser
 from security.header import api_key_header
+from s3_events.s3_upload_file import upload_to_s3
 
 from mongo.mongo_crud import content_crud
 from schemas.mongo import *
 from mongo.pg_mongo_aggregation import merge_user_data
+from mongo.helpers import put_post_image
 
 router = APIRouter(
     prefix="/mongo",
@@ -19,8 +21,9 @@ router = APIRouter(
 
 
 @router.post("/new_post", response_description="Create new Post", response_model=ResponsePostCreateSchema)
-async def create_post(post: RequestPostCreateSchema):
-    data = await content_crud.new_post(post)
+async def create_post(post: RequestPostCreateSchema = Depends(),
+                      file: UploadFile = File(..., description='uploading file')):
+    data = await put_post_image(post, upload_to_s3(file))
     return data
 
 
@@ -76,9 +79,8 @@ async def delete_post(post_id: str):
 
 @router.put("/post/update/{post_id}", response_description="Post update", response_model=ResponseUpdatePostSchema)
 async def post_update(post_id: str, post: RequestPostUpdateSchema):
-    print(post)
-    update_post = await content_crud.update_post(post_id=post_id, update_data=dict(post))
-    return update_post
+    updated_post = await content_crud.update_post(post_id=post_id, update_data=dict(post))
+    return updated_post
 
 
 @router.post("/add_comment", response_description="Add new comment", response_model=ResponseCommentSchema)
