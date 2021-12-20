@@ -76,10 +76,9 @@ async def delete_post(post_id: str):
 
 @router.put("/post/update/{post_id}", response_description="Post update", response_model=ResponseUpdatePostSchema)
 async def post_update(post_id: str, post: RequestPostUpdateSchema):
-    updated_post = await content_crud.get_collection().update_one({"_id": post_id}, {"$set": post.dict()})
-    post_body = await content_crud.get_collection().find_one({"_id": post_id})
-    if updated_post:
-        return post_body
+    print(post)
+    update_post = await content_crud.update_post(post_id=post_id, update_data=dict(post))
+    return update_post
 
 
 @router.post("/add_comment", response_description="Add new comment", response_model=ResponseCommentSchema)

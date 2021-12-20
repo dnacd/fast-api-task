@@ -47,8 +47,9 @@ class ContentCRUD:
         return [ResponsePostSchema(**one) for one in data]
 
     async def update_post(self, post_id: str, update_data: dict) -> ResponseUpdatePostSchema:
-        result = await self.get_collection().update_one({'_id': ObjectId(post_id)}, {'$set': update_data})
-        return result
+        await self.get_collection().update_one({'_id': ObjectId(post_id)}, {'$set': update_data})
+        find = await self.get_collection().find_one({"_id": ObjectId(post_id)})
+        return find
 
     async def get_post(self, post_id: str) -> ResponsePostSchema:
         finder = {"$match": {"_id": ObjectId(post_id)}}
