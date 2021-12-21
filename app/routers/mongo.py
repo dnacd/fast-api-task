@@ -62,14 +62,16 @@ async def post_list_mongo(page: Optional[int] = None,  size: Optional[int] = Non
     return items
 
 
-@router.get("/post/{post_id}", response_description="Post Detail", response_model=ResponsePostSchema)
+@router.get("/post/{post_id}", response_description="Post Detail")
 async def post_detail_mongo(post_id: str):
     data = await content_crud.get_post(post_id=post_id)
-    await merge_user_data(data, single=True)
-    return data
+    if data is not None:
+        await merge_user_data(data, single=True)
+        return ResponsePostSchema.dict(data)
+    return HTTPException(status_code=404, detail='Not Found')
 
 
-@router.delete("/post/delete/{post_id}", response_description="Delete a student")
+@router.delete("/post/delete/{post_id}", response_description="Post Delete")
 async def delete_post(post_id: str):
     delete_result = await content_crud.delete_post(post_id)
     if delete_result.deleted_count == 1:

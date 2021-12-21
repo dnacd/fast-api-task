@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pymongo.collection import Collection
 from fastapi.encoders import jsonable_encoder
@@ -26,10 +26,6 @@ class ContentCRUD:
 
     @staticmethod
     def get_collection() -> Collection:
-        """
-        Get main collection for Post documents
-        :return: Collection
-        """
         return mongo_db.db.get_collection(get_settings().posts_collection)
 
     async def new_post(self, post: PostCreateDBSchema) -> ResponsePostSchema:
@@ -57,10 +53,12 @@ class ContentCRUD:
         find = await self.get_collection().find_one({"_id": ObjectId(post_id)})
         return find
 
-    async def get_post(self, post_id: str) -> ResponsePostSchema:
+    async def get_post(self, post_id: str) -> Optional[ResponsePostSchema]:
         finder = {"$match": {"_id": ObjectId(post_id)}}
         data = await self.get_collection().aggregate(make_aggregation(finder=finder)).to_list(1)
-        return ResponsePostSchema(**data[0])
+        if data:
+            return ResponsePostSchema(**data[0])
+        return None
 
     async def delete_post(self, post_id: str):
         finder = {"_id": ObjectId(post_id)}
