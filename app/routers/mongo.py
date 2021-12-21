@@ -77,10 +77,12 @@ async def delete_post(post_id: str):
     raise HTTPException(status_code=404, detail=f"Post {post_id} not found")
 
 
-@router.put("/post/update/{post_id}", response_description="Post update", response_model=ResponseUpdatePostSchema)
+@router.put("/post/update/{post_id}", response_description="Post update")
 async def post_update(post_id: str, post: RequestPostUpdateSchema):
     updated_post = await content_crud.update_post(post_id=post_id, update_data=dict(post))
-    return updated_post
+    if updated_post is not None:
+        return ResponseUpdatePostSchema(**updated_post)
+    return HTTPException(status_code=404, detail=f'Post {post_id} Not Found')
 
 
 @router.post("/add_comment", response_description="Add new comment", response_model=ResponseCommentSchema)

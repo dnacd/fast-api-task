@@ -1,3 +1,5 @@
+from typing import List
+
 from pymongo.collection import Collection
 from fastapi.encoders import jsonable_encoder
 from bson.objectid import ObjectId
@@ -36,7 +38,11 @@ class ContentCRUD:
         created_post = await self.get_collection().find_one({"_id": ObjectId(data.inserted_id)})
         return created_post
 
-    async def get_post_list(self, logged=False, paginate=False, page_size=None, skips=None, filter_match=None):
+    async def get_post_list(self, logged=False,
+                            paginate=False,
+                            page_size=None,
+                            skips=None,
+                            filter_match=None) -> List[ResponsePostSchema]:
         keyword_args = {
             "logged": logged,
             "paginate": paginate,

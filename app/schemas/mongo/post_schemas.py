@@ -88,7 +88,7 @@ class ResponsePostSchema(PostIdMixin):
     author: Optional[UserInAggregationSchema]
     title: constr(max_length=55)
     slug: constr(max_length=35)
-    image: HttpUrl
+    image: Optional[HttpUrl]
     created: datetime.datetime
     logged_only: bool
     comments: List[CommentsJoinSchema]
@@ -136,4 +136,5 @@ class ResponseUpdatePostSchema(PostIdMixin):
     created: datetime.datetime
     logged_only: bool
     categories_id: List
+    image: Optional[HttpUrl]
     tags_id: List
