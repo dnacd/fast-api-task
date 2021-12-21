@@ -76,7 +76,7 @@ async def delete_post(post_id: str):
     delete_result = await content_crud.delete_post(post_id)
     if delete_result.deleted_count == 1:
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
-    raise HTTPException(status_code=404, detail=f"Post {post_id} not found")
+    raise HTTPException(status_code=404, detail=f"Post {post_id} not exist")
 
 
 @router.put("/post/update/{post_id}", response_description="Post update")
