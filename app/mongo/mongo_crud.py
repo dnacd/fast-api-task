@@ -1,5 +1,4 @@
 from typing import List, Optional
-
 from pymongo.collection import Collection
 from fastapi.encoders import jsonable_encoder
 from bson.objectid import ObjectId
@@ -29,7 +28,6 @@ class ContentCRUD:
         return mongo_db.db.get_collection(get_settings().posts_collection)
 
     async def new_post(self, post: PostCreateDBSchema) -> ResponsePostSchema:
-        post = jsonable_encoder(post)
         data = await self.get_collection().insert_one(post)
         created_post = await self.get_collection().find_one({"_id": ObjectId(data.inserted_id)})
         return created_post

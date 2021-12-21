@@ -35,6 +35,23 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: 12345678
     ports:
       - "27017:27017"
-    command: --quiet
+    command: mongod --quiet
     volumes:
       - ./data/mongo:/data/db
+
+  redis:
+    image: redis:6.2-alpine
+
+  celery_worker:
+    build: .
+    command: celery -A celery_t.celery_worker worker --loglevel=info -Q main-queue
+    volumes:
+      - ./app:/app
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    env_file:
+      - .env
+    depends_on:
+      - app
+      - redis

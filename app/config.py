@@ -19,5 +19,8 @@ class Settings(BaseSettings):
     MONGO_INITDB_ROOT_PASSWORD: str
     MONGO_INITDB_DATABASE: str
 
+    CELERY_BROKER_URL: str
+    CELERY_RESULT_BACKEND: str
+
     class Config:
         case_sensitive = True

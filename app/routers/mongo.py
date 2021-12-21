@@ -3,15 +3,18 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from fastapi.responses import JSONResponse
 
+from celery_t.celery_worker import celery
 from routers.common_query_params import CommonQueryParams
+from s3_events.s3_upload_file import upload_to_s3
 from security.auth import AuthUser
 from security.header import api_key_header
-from s3_events.s3_upload_file import upload_to_s3
+
 
 from mongo.mongo_crud import content_crud
 from schemas.mongo import *
 from mongo.pg_mongo_aggregation import merge_user_data
 from mongo.helpers import put_post_image
+
 
 router = APIRouter(
     prefix="/mongo",
@@ -23,7 +26,15 @@ router = APIRouter(
 @router.post("/new_post", response_description="Create new Post", response_model=ResponsePostCreateSchema)
 async def create_post(post: RequestPostCreateSchema = Depends(),
                       file: UploadFile = File(..., description='uploading file')):
-    data = await put_post_image(post, upload_to_s3(file))
+    data = await put_post_image(post, await upload_to_s3(file))
+    post_id = data.get('_id')
+    print(post_id)
+    # celery.send_task(
+    #     name="resizing_images",
+    #     kwargs={
+    #         "post_id": post_id
+    #     }
+    # )
     return data
 
 
@@ -64,6 +75,7 @@ async def post_list_mongo(page: Optional[int] = None,  size: Optional[int] = Non
 
 @router.get("/post/{post_id}", response_description="Post Detail")
 async def post_detail_mongo(post_id: str):
+
     data = await content_crud.get_post(post_id=post_id)
     if data is not None:
         await merge_user_data(data, single=True)

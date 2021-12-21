@@ -13,7 +13,6 @@ class RequestPostCreateSchema(BaseModel):
     categories_id: List[str]
     tags_id: List[str]
     content: str
-    image: Optional[str]
     logged_only: bool
 
     class Config:
@@ -40,6 +39,8 @@ class PostCreateDBSchema(PostIdMixin):
     content: str
     image: Optional[HttpUrl]
     logged_only: bool
+    resize_process: bool
+    sizes: Optional[List]
 
     class Config:
         allow_population_by_field_name = True
@@ -57,6 +58,8 @@ class ResponsePostCreateSchema(PostIdMixin):
     content: str
     image: HttpUrl
     logged_only: bool
+    resize_process: bool
+    sizes: Optional[List]
 
 
 class CatTagJoinSchema(BaseModel):
@@ -94,6 +97,8 @@ class ResponsePostSchema(PostIdMixin):
     comments: List[CommentsJoinSchema]
     categories: List[CatTagJoinSchema]
     tags: List[CatTagJoinSchema]
+    resize_process: bool
+    sizes: Optional[List]
 
 
 class PostViewSchema(BaseModel):
@@ -112,6 +117,8 @@ class RequestPostUpdateSchema(BaseModel):
     content: str
     image: HttpUrl
     logged_only: bool
+    resize_process: bool
+    sizes: Optional[List]
 
     class Config:
         schema_extra = {
@@ -138,3 +145,5 @@ class ResponseUpdatePostSchema(PostIdMixin):
     categories_id: List
     image: Optional[HttpUrl]
     tags_id: List
+    resize_process: bool
+    sizes: Optional[List]
